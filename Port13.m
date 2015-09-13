@@ -1,43 +1,67 @@
 function main
-    try
-        a = arduino('com3', 'uno');
-        for i = 1:10
-            s(o(s(a)));
+    init('com5', s(o(s(s(o(s(s(o(fin())))))))));
+
+    function init(port, fn)
+        try
+            disp('0');
+            a = arduino(port, 'uno');
+            led_fn = @(on) led(a, on);
+            fn(led_fn);
+        catch ME
+            clear a
+            rethrow(ME)
         end
-    catch
-        clear a
+    end
+
+    function led(a, on)
+        writeDigitalPin(a, 11, on);
+        pause(0.25);
+    end
+
+    function fn=fin()
+        function v=fin_(led_fn) 
+            disp('$');
+            led_fn(1);
+            v = 0;
+        end
+        fn=@(led_fn) fin_(led_fn);
+    end
+
+    function dot(led_fn)
+        disp('.')
+        led_fn(0)
+        led_fn(1)
+    end
+
+    function dash(led_fn)
+        disp('-')
+        led_fn(0)
+        led_fn(0)
+        led_fn(0)
+        led_fn(1)
+    end
+
+    function fn=s(next) 
+        function s(led_fn)
+            disp('s')
+            dot(led_fn);
+            dot(led_fn);
+            dot(led_fn);
+            next(led_fn);
+        end
+        fn=@(led_fn) s(led_fn)
+    end
+
+    function fn=o(next)
+        function o(led_fn)
+            disp('o')
+            dash(led_fn);
+            dash(led_fn);
+            dash(led_fn);
+            next(led_fn);
+        end
+        fn=@(led_fn) o(led_fn)
     end
 end
 
-function f=led(a, on)
-    writeDigitalPin(a, 13, on);
-    pause(0.1);
-    f = a;
-end
-    
-function f=dot(a)
-    led(a, 1);
-    led(a, 0);
-    led(a, 0);
-    led(a, 0);
-    led(a, 0);
-    f=a;
-end
-
-function f=dash(a)
-    led(a, 1);
-    led(a, 1);
-    led(a, 1);
-    led(a, 1);
-    led(a, 0);
-    f=a;
-end
-
-function f=s(a)
-    f=dot(dot(dot(a)));
-end
-
-function f=o(a)
-    f=dash(dash(dash(a)));
-end
 
